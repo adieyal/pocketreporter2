@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Cloud, CheckCircle2, Share, Loader2, Check, Pencil } from 'lucide-react';
+import type { SourceContact, StoryLocation } from '../lib/types';
 
 // Hooks
 import { useEditor } from '../hooks/useEditor';
@@ -28,14 +29,18 @@ export function EditorPage() {
   // 1. Initialize all hooks
   const { story, loading, saving, updateHeadline, updateAnswer, setStatus } = useEditor(storyUuid);
   const { media, addMedia, addDocument, uploading } = useMedia(storyUuid);
-  const { contacts, addContact, deleteContact } = useContacts(storyUuid);
-  const { locations, addLocation, deleteLocation } = useLocations(storyUuid);
+  const { contacts, addContact, updateContact, deleteContact } = useContacts(storyUuid);
+  const { locations, addLocation, updateLocation, deleteLocation } = useLocations(storyUuid);
 
   // 2. Modal States
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isLocModalOpen, setIsLocModalOpen] = useState(false);
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
+
+  // 3. Editing States
+  const [editingContact, setEditingContact] = useState<SourceContact | null>(null);
+  const [editingLocation, setEditingLocation] = useState<StoryLocation | null>(null);
 
   // 3. Handlers
   const handleExport = async () => {
@@ -157,8 +162,16 @@ export function EditorPage() {
         <hr className="my-8 border-gray-200" />
 
         {/* Lists & Gallery */}
-        <ContactList contacts={contacts} onDelete={deleteContact} />
-        <LocationList locations={locations} onDelete={deleteLocation} />
+        <ContactList
+          contacts={contacts}
+          onDelete={deleteContact}
+          onEdit={(contact) => { setEditingContact(contact); setIsContactModalOpen(true); }}
+        />
+        <LocationList
+          locations={locations}
+          onDelete={deleteLocation}
+          onEdit={(location) => { setEditingLocation(location); setIsLocModalOpen(true); }}
+        />
         <MediaGallery items={media} />
 
       </div>
@@ -167,22 +180,36 @@ export function EditorPage() {
       <MediaToolbar
         onAddMedia={addMedia}
         uploading={uploading}
-        onAddSource={() => setIsContactModalOpen(true)}
-        onAddLocation={() => setIsLocModalOpen(true)}
+        onAddSource={() => { setEditingContact(null); setIsContactModalOpen(true); }}
+        onAddLocation={() => { setEditingLocation(null); setIsLocModalOpen(true); }}
         onScanDocument={() => setIsScanModalOpen(true)}
       />
 
       {/* --- MODALS --- */}
       <ContactModal
         isOpen={isContactModalOpen}
-        onClose={() => setIsContactModalOpen(false)}
-        onSave={async (data) => { await addContact(data); }}
+        onClose={() => { setIsContactModalOpen(false); setEditingContact(null); }}
+        onSave={async (data) => {
+          if (editingContact?.id) {
+            await updateContact(editingContact.id, data);
+          } else {
+            await addContact(data);
+          }
+        }}
+        editingContact={editingContact}
       />
 
       <LocationModal
         isOpen={isLocModalOpen}
-        onClose={() => setIsLocModalOpen(false)}
-        onSave={async (data) => { await addLocation(data); }}
+        onClose={() => { setIsLocModalOpen(false); setEditingLocation(null); }}
+        onSave={async (data) => {
+          if (editingLocation?.id) {
+            await updateLocation(editingLocation.id, data);
+          } else {
+            await addLocation(data);
+          }
+        }}
+        editingLocation={editingLocation}
       />
 
       <ScannerModal
