@@ -1,13 +1,14 @@
-import { Camera, Mic, MapPin, Users, Loader2 } from 'lucide-react';
+import { Camera, Mic, MapPin, Users, Loader2, ScanLine } from 'lucide-react';
 
 interface MediaToolbarProps {
   onAddMedia: (file: File, type: 'photo' | 'audio') => void;
   uploading: boolean;
   onAddSource: () => void;
   onAddLocation: () => void;
+  onScanDocument: () => void;
 }
 
-export function MediaToolbar({ onAddMedia, uploading, onAddSource, onAddLocation }: MediaToolbarProps) {
+export function MediaToolbar({ onAddMedia, uploading, onAddSource, onAddLocation, onScanDocument }: MediaToolbarProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'photo' | 'audio') => {
     const file = e.target.files?.[0];
     if (file) {
@@ -50,7 +51,18 @@ export function MediaToolbar({ onAddMedia, uploading, onAddSource, onAddLocation
           />
         </label>
 
-        {/* 3. SOURCE ACTION */}
+        {/* 3. SCAN ACTION */}
+        <button
+          onClick={onScanDocument}
+          className="flex flex-col items-center gap-1 p-2 rounded-xl active:bg-gray-100 transition-colors"
+        >
+          <div className="bg-gray-800 text-white p-3 rounded-full shadow-lg">
+            <ScanLine size={24} />
+          </div>
+          <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Scan</span>
+        </button>
+
+        {/* 4. SOURCE ACTION */}
         <button
           onClick={onAddSource}
           className="flex flex-col items-center gap-1 p-2 rounded-xl active:bg-gray-100 transition-colors"
@@ -61,7 +73,7 @@ export function MediaToolbar({ onAddMedia, uploading, onAddSource, onAddLocation
           <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Source</span>
         </button>
 
-        {/* 4. LOCATION ACTION */}
+        {/* 5. LOCATION ACTION */}
         <button
           onClick={onAddLocation}
           className="flex flex-col items-center gap-1 p-2 rounded-xl active:bg-gray-100 transition-colors"

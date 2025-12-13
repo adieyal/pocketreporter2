@@ -41,9 +41,10 @@ export interface Story {
 export interface MediaItem {
   id?: number;
   storyUuid: string;
-  type: 'photo' | 'audio';
+  type: 'photo' | 'audio' | 'document';
   blob: Blob;
   caption: string;
+  extractedText?: string;
   createdAt: string;
 }
 
