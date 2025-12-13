@@ -26,7 +26,7 @@ export function EditorPage() {
 
   // 1. Initialize all hooks
   const { story, loading, saving, updateHeadline, updateAnswer, setStatus } = useEditor(storyUuid);
-  const { media } = useMedia(storyUuid);
+  const { media, addMedia, uploading } = useMedia(storyUuid);
   const { contacts, addContact, deleteContact } = useContacts(storyUuid);
   const { locations, addLocation, deleteLocation } = useLocations(storyUuid);
 
@@ -163,7 +163,8 @@ export function EditorPage() {
 
       {/* --- BOTTOM TOOLBAR --- */}
       <MediaToolbar
-        storyUuid={storyUuid}
+        onAddMedia={addMedia}
+        uploading={uploading}
         onAddSource={() => setIsContactModalOpen(true)}
         onAddLocation={() => setIsLocModalOpen(true)}
       />
