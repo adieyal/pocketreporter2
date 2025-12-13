@@ -29,10 +29,15 @@ export function useContacts(storyUuid: string) {
     return id;
   };
 
+  const updateContact = async (id: number, data: Omit<SourceContact, 'id' | 'storyUuid' | 'createdAt'>) => {
+    await db.contacts.update(id, data);
+    setContacts(prev => prev.map(c => c.id === id ? { ...c, ...data } : c));
+  };
+
   const deleteContact = async (id: number) => {
     await db.contacts.delete(id);
     setContacts(prev => prev.filter(c => c.id !== id));
   };
 
-  return { contacts, addContact, deleteContact, loading };
+  return { contacts, addContact, updateContact, deleteContact, loading };
 }

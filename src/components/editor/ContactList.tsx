@@ -1,7 +1,7 @@
-import { Phone, Trash2, User } from 'lucide-react';
+import { Phone, Trash2, User, Pencil } from 'lucide-react';
 import type { SourceContact } from '../../lib/types';
 
-export function ContactList({ contacts, onDelete }: { contacts: SourceContact[], onDelete: (id: number) => void }) {
+export function ContactList({ contacts, onDelete, onEdit }: { contacts: SourceContact[], onDelete: (id: number) => void, onEdit: (contact: SourceContact) => void }) {
   if (contacts.length === 0) return null;
 
   return (
@@ -40,6 +40,12 @@ export function ContactList({ contacts, onDelete }: { contacts: SourceContact[],
                   <Phone size={16} />
                 </a>
               )}
+              <button
+                onClick={() => onEdit(contact)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg"
+              >
+                <Pencil size={16} />
+              </button>
               <button
                 onClick={() => contact.id && onDelete(contact.id)}
                 className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg"

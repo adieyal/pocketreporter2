@@ -1,7 +1,7 @@
-import { MapPin, Trash2, ExternalLink } from 'lucide-react';
+import { MapPin, Trash2, ExternalLink, Pencil } from 'lucide-react';
 import type { StoryLocation } from '../../lib/types';
 
-export function LocationList({ locations, onDelete }: { locations: StoryLocation[], onDelete: (id: number) => void }) {
+export function LocationList({ locations, onDelete, onEdit }: { locations: StoryLocation[], onDelete: (id: number) => void, onEdit: (location: StoryLocation) => void }) {
   if (locations.length === 0) return null;
 
   return (
@@ -37,6 +37,12 @@ export function LocationList({ locations, onDelete }: { locations: StoryLocation
                   <ExternalLink size={16} />
                 </a>
               )}
+              <button
+                onClick={() => onEdit(loc)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg"
+              >
+                <Pencil size={16} />
+              </button>
               <button
                 onClick={() => loc.id && onDelete(loc.id)}
                 className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg"

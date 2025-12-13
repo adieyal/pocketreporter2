@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Save, User, Phone, Briefcase, FileText, Mail, Plus } from 'lucide-react';
 import type { SourceContact } from '../../lib/types';
 
@@ -6,9 +6,10 @@ interface ContactModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: Omit<SourceContact, 'id' | 'storyUuid' | 'createdAt'>) => Promise<void>;
+  editingContact?: SourceContact | null;
 }
 
-export function ContactModal({ isOpen, onClose, onSave }: ContactModalProps) {
+export function ContactModal({ isOpen, onClose, onSave, editingContact }: ContactModalProps) {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -18,6 +19,23 @@ export function ContactModal({ isOpen, onClose, onSave }: ContactModalProps) {
     notes: ''
   });
   const [saving, setSaving] = useState(false);
+
+  const isEditing = !!editingContact;
+
+  useEffect(() => {
+    if (editingContact) {
+      setFormData({
+        name: editingContact.name,
+        phone: editingContact.phone,
+        role: editingContact.role,
+        organization: editingContact.organization,
+        email: editingContact.email,
+        notes: editingContact.notes
+      });
+    } else {
+      resetForm();
+    }
+  }, [editingContact, isOpen]);
 
   if (!isOpen) return null;
 
@@ -53,7 +71,7 @@ export function ContactModal({ isOpen, onClose, onSave }: ContactModalProps) {
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-bold flex items-center gap-2">
             <User className="text-brand" size={20} />
-            New Source
+            {isEditing ? 'Edit Source' : 'New Source'}
           </h3>
           <button onClick={onClose} className="p-2 bg-gray-100 rounded-full text-gray-500">
             <X size={20} />
@@ -133,20 +151,22 @@ export function ContactModal({ isOpen, onClose, onSave }: ContactModalProps) {
           </div>
 
           <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => handleSave(true)}
-              disabled={saving || !formData.name}
-              className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
-            >
-              <Plus size={18} /> Save & Add Another
-            </button>
+            {!isEditing && (
+              <button
+                type="button"
+                onClick={() => handleSave(true)}
+                disabled={saving || !formData.name}
+                className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
+              >
+                <Plus size={18} /> Save & Add Another
+              </button>
+            )}
             <button
               type="submit"
               disabled={saving || !formData.name}
               className="flex-1 py-3 bg-brand text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
             >
-              <Save size={18} /> Save & Close
+              <Save size={18} /> {isEditing ? 'Update' : 'Save & Close'}
             </button>
           </div>
         </form>

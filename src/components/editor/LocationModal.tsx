@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Save, MapPin, Navigation, Loader2, Plus } from 'lucide-react';
 import type { StoryLocation } from '../../lib/types';
 
@@ -6,9 +6,10 @@ interface LocationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: Omit<StoryLocation, 'id' | 'storyUuid' | 'createdAt'>) => Promise<void>;
+  editingLocation?: StoryLocation | null;
 }
 
-export function LocationModal({ isOpen, onClose, onSave }: LocationModalProps) {
+export function LocationModal({ isOpen, onClose, onSave, editingLocation }: LocationModalProps) {
   const [formData, setFormData] = useState<Partial<StoryLocation>>({
     name: '',
     address: '',
@@ -16,6 +17,22 @@ export function LocationModal({ isOpen, onClose, onSave }: LocationModalProps) {
   });
   const [gpsLoading, setGpsLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const isEditing = !!editingLocation;
+
+  useEffect(() => {
+    if (editingLocation) {
+      setFormData({
+        name: editingLocation.name,
+        address: editingLocation.address,
+        notes: editingLocation.notes,
+        lat: editingLocation.lat,
+        lng: editingLocation.lng
+      });
+    } else {
+      resetForm();
+    }
+  }, [editingLocation, isOpen]);
 
   if (!isOpen) return null;
 
@@ -77,7 +94,7 @@ export function LocationModal({ isOpen, onClose, onSave }: LocationModalProps) {
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-bold flex items-center gap-2">
             <MapPin className="text-brand" size={20} />
-            Add Location
+            {isEditing ? 'Edit Location' : 'Add Location'}
           </h3>
           <button onClick={onClose} className="p-2 bg-gray-100 rounded-full text-gray-500">
             <X size={20} />
@@ -129,20 +146,22 @@ export function LocationModal({ isOpen, onClose, onSave }: LocationModalProps) {
           </div>
 
           <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => handleSave(true)}
-              disabled={saving || !formData.name}
-              className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
-            >
-              <Plus size={18} /> Save & Add Another
-            </button>
+            {!isEditing && (
+              <button
+                type="button"
+                onClick={() => handleSave(true)}
+                disabled={saving || !formData.name}
+                className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
+              >
+                <Plus size={18} /> Save & Add Another
+              </button>
+            )}
             <button
               type="submit"
               disabled={saving || !formData.name}
               className="flex-1 py-3 bg-brand text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
             >
-              <Save size={18} /> Save & Close
+              <Save size={18} /> {isEditing ? 'Update' : 'Save & Close'}
             </button>
           </div>
         </form>
