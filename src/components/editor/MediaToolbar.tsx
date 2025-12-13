@@ -1,7 +1,12 @@
-import { Camera, Mic, Paperclip } from 'lucide-react';
+import { Camera, Mic, Paperclip, Users } from 'lucide-react';
 import { useMedia } from '../../hooks/useMedia';
 
-export function MediaToolbar({ storyUuid }: { storyUuid: string }) {
+interface MediaToolbarProps {
+  storyUuid: string;
+  onSourceClick?: () => void;
+}
+
+export function MediaToolbar({ storyUuid, onSourceClick }: MediaToolbarProps) {
   const { addMedia, uploading } = useMedia(storyUuid);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'photo' | 'audio') => {
@@ -43,6 +48,17 @@ export function MediaToolbar({ storyUuid }: { storyUuid: string }) {
           onChange={(e) => handleFileChange(e, 'audio')}
         />
       </label>
+
+      {/* Source Contact */}
+      <button
+        onClick={onSourceClick}
+        className="flex flex-col items-center gap-1 text-gray-600 active:scale-95 transition-transform"
+      >
+        <div className="bg-gray-100 p-3 rounded-full">
+          <Users size={24} />
+        </div>
+        <span className="text-xs">Source</span>
+      </button>
 
       <button className="flex flex-col items-center gap-1 text-gray-400">
         <div className="bg-gray-50 p-3 rounded-full">

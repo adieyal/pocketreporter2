@@ -46,3 +46,15 @@ export interface MediaItem {
   caption: string;
   createdAt: string;
 }
+
+export interface SourceContact {
+  id?: number;
+  storyUuid: string;
+  name: string;
+  role: string;
+  organization: string;
+  phone: string;
+  email: string;
+  notes: string;
+  createdAt: string;
+}

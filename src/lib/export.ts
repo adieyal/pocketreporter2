@@ -26,9 +26,43 @@ export async function generateStoryZip(story: Story): Promise<Blob> {
     mdContent += `### ${index + 1}. ${q.text}\n${answerText}\n\n`;
   });
 
+  // 3. Fetch Contacts and append to markdown
+  const contacts = await db.contacts.where('storyUuid').equals(story.uuid).toArray();
+
+  if (contacts.length > 0) {
+    mdContent += `---\n## Sources & Contacts\n\n`;
+    contacts.forEach(c => {
+      mdContent += `### ${c.name}\n`;
+      if (c.role || c.organization) mdContent += `**Role:** ${c.role} ${c.organization ? `(${c.organization})` : ''}\n`;
+      if (c.phone) mdContent += `**Phone:** ${c.phone}\n`;
+      if (c.email) mdContent += `**Email:** ${c.email}\n`;
+      if (c.notes) mdContent += `**Notes:** ${c.notes}\n\n`;
+    });
+  }
+
   root.file('story.md', mdContent);
 
-  // 3. Fetch and Add Media Blobs
+  // 4. Create contacts CSV for spreadsheet import
+  if (contacts.length > 0) {
+    let csvContent = "Name,Role,Organization,Phone,Email,Notes\n";
+    contacts.forEach(c => {
+      // Escape quotes by doubling them, wrap fields in quotes
+      const safe = (str: string) => `"${(str || '').replace(/"/g, '""')}"`;
+      const row = [
+        safe(c.name),
+        safe(c.role),
+        safe(c.organization),
+        safe(c.phone),
+        safe(c.email),
+        safe(c.notes)
+      ].join(",");
+      csvContent += row + "\n";
+    });
+
+    root.file('sources.csv', csvContent);
+  }
+
+  // 5. Fetch and Add Media Blobs
   const mediaItems = await db.media.where('storyUuid').equals(story.uuid).toArray();
 
   if (mediaItems.length > 0) {
@@ -43,7 +77,7 @@ export async function generateStoryZip(story: Story): Promise<Blob> {
     });
   }
 
-  // 4. Generate the final ZIP blob
+  // 6. Generate the final ZIP blob
   const content = await zip.generateAsync({ type: 'blob' });
   return content;
 }

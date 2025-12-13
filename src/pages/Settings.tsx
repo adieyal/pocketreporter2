@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Shield, Trash2, AlertTriangle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Shield, Trash2, AlertTriangle, HelpCircle } from 'lucide-react';
 import { useSecurity } from '../hooks/useSecurity';
 import { db } from '../lib/db';
 
@@ -99,6 +100,14 @@ export function SettingsPage() {
             <div className="font-medium text-gray-900">Clear Storage</div>
           </button>
         </div>
+      </section>
+
+      {/* Help Section */}
+      <section className="mt-8">
+        <Link to="/help" className="flex items-center gap-2 text-brand font-medium justify-center p-4 hover:bg-gray-50 rounded-xl transition-colors">
+          <HelpCircle size={20} />
+          <span>Help & User Guide</span>
+        </Link>
       </section>
     </div>
   );

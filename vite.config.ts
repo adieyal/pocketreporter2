@@ -2,8 +2,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
-  base: '/pocketreporter2/',
+export default defineConfig(({ mode }) => ({
+  base: mode === 'production' ? '/pocketreporter2/' : '/',
   plugins: [
     react(),
     VitePWA({
@@ -44,4 +44,4 @@ export default defineConfig({
       }
     })
   ]
-});
+}));

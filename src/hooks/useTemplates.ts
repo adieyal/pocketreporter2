@@ -7,7 +7,7 @@ export function useTemplates() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/templates.json')
+    fetch(`${import.meta.env.BASE_URL}templates.json`)
       .then(res => res.json())
       .then(data => {
         setCategories(data.categories);

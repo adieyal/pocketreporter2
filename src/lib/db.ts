@@ -1,9 +1,10 @@
 import Dexie, { type Table } from 'dexie';
-import type { Story, MediaItem } from './types';
+import type { Story, MediaItem, SourceContact } from './types';
 
 class PocketReporterDB extends Dexie {
   stories!: Table<Story>;
   media!: Table<MediaItem>;
+  contacts!: Table<SourceContact>;
 
   constructor() {
     super('PocketReporterDB');
@@ -15,6 +16,12 @@ class PocketReporterDB extends Dexie {
     this.version(2).stores({
       stories: '++id, uuid, status, updatedAt',
       media: '++id, storyUuid, type, createdAt'
+    });
+    // Version 3: added contacts table
+    this.version(3).stores({
+      stories: '++id, uuid, status, updatedAt',
+      media: '++id, storyUuid, type, createdAt',
+      contacts: '++id, storyUuid'
     });
   }
 }

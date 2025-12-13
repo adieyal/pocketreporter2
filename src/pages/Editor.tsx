@@ -3,9 +3,12 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Cloud, CheckCircle2, Share, Loader2, Check, Pencil } from 'lucide-react';
 import { useEditor } from '../hooks/useEditor';
 import { useMedia } from '../hooks/useMedia';
+import { useContacts } from '../hooks/useContacts';
 import { QuestionCard } from '../components/editor/QuestionCard';
 import { MediaToolbar } from '../components/editor/MediaToolbar';
 import { MediaGallery } from '../components/editor/MediaGallery';
+import { ContactModal } from '../components/editor/ContactModal';
+import { ContactList } from '../components/editor/ContactList';
 import { generateStoryZip } from '../lib/export';
 
 export function EditorPage() {
@@ -13,8 +16,10 @@ export function EditorPage() {
   const storyUuid = id || '';
   const { story, loading, saving, updateHeadline, updateAnswer, setStatus } = useEditor(storyUuid);
   const { media } = useMedia(storyUuid);
+  const { contacts, addContact, deleteContact } = useContacts(storyUuid);
 
   const [exporting, setExporting] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   const handleExport = async () => {
     if (!story) return;
@@ -139,6 +144,9 @@ export function EditorPage() {
           )}
         </div>
 
+        {/* Contacts List */}
+        <ContactList contacts={contacts} onDelete={deleteContact} />
+
         {/* Media Gallery */}
         <MediaGallery items={media} />
 
@@ -147,7 +155,14 @@ export function EditorPage() {
       </div>
 
       {/* Media Toolbar */}
-      <MediaToolbar storyUuid={storyUuid} />
+      <MediaToolbar storyUuid={storyUuid} onSourceClick={() => setIsContactModalOpen(true)} />
+
+      {/* Contact Modal */}
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        onSave={async (data) => { await addContact(data); }}
+      />
     </div>
   );
 }

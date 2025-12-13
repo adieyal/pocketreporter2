@@ -18,10 +18,23 @@ export function HomePage() {
     loadStories();
   }, []);
 
-  const filteredStories = stories.filter(story =>
-    story.headline.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    story.templateSnapshot.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredStories = stories.filter(story => {
+    const query = searchQuery.toLowerCase();
+
+    // Search headline and template name
+    if (story.headline.toLowerCase().includes(query)) return true;
+    if (story.templateSnapshot.name.toLowerCase().includes(query)) return true;
+    if (story.templateSnapshot.description.toLowerCase().includes(query)) return true;
+
+    // Search all answer values
+    for (const answer of Object.values(story.answers)) {
+      if (typeof answer.value === 'string' && answer.value.toLowerCase().includes(query)) {
+        return true;
+      }
+    }
+
+    return false;
+  });
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
