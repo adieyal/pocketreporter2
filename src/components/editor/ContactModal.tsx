@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Save, User, Phone, Briefcase, FileText, Mail } from 'lucide-react';
+import { X, Save, User, Phone, Briefcase, FileText, Mail, Plus } from 'lucide-react';
 import type { SourceContact } from '../../lib/types';
 
 interface ContactModalProps {
@@ -21,26 +21,35 @@ export function ContactModal({ isOpen, onClose, onSave }: ContactModalProps) {
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const resetForm = () => {
+    setFormData({ name: '', phone: '', role: '', organization: '', email: '', notes: '' });
+  };
+
+  const handleSave = async (keepOpen: boolean) => {
     if (!formData.name) return;
 
     setSaving(true);
     await onSave(formData);
-
-    // Reset and close
-    setFormData({ name: '', phone: '', role: '', organization: '', email: '', notes: '' });
+    resetForm();
     setSaving(false);
-    onClose();
+
+    if (!keepOpen) {
+      onClose();
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSave(false);
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center pointer-events-none">
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 pointer-events-auto" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       {/* Modal Content */}
-      <div className="bg-white w-full max-w-lg rounded-t-2xl sm:rounded-xl p-4 shadow-2xl pointer-events-auto animate-in slide-in-from-bottom-10 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200">
+      <div className="relative bg-white w-full max-w-lg rounded-t-2xl sm:rounded-xl p-4 shadow-2xl">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-bold flex items-center gap-2">
             <User className="text-brand" size={20} />
@@ -123,13 +132,23 @@ export function ContactModal({ isOpen, onClose, onSave }: ContactModalProps) {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="w-full py-3 bg-brand text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform"
-          >
-            {saving ? 'Saving...' : <><Save size={18} /> Save Contact</>}
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => handleSave(true)}
+              disabled={saving || !formData.name}
+              className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
+            >
+              <Plus size={18} /> Save & Add Another
+            </button>
+            <button
+              type="submit"
+              disabled={saving || !formData.name}
+              className="flex-1 py-3 bg-brand text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
+            >
+              <Save size={18} /> Save & Close
+            </button>
+          </div>
         </form>
       </div>
     </div>
