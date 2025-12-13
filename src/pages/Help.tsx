@@ -1,5 +1,6 @@
-import { ChevronLeft, Download, Shield, Wifi } from 'lucide-react';
+import { ChevronLeft, Download, Shield, Wifi, ScanLine, Camera } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { version } from '../../package.json';
 
 export function HelpPage() {
   return (
@@ -32,6 +33,16 @@ export function HelpPage() {
               title="Offline Mode"
               text="Pocket Reporter works offline. You only need internet to download new templates or app updates."
             />
+            <HelpCard
+              icon={<ScanLine size={20} />}
+              title="Document Scanner"
+              text="Use the Scan button to photograph documents, receipts, or letters. Text is extracted automatically using OCR for easy editing."
+            />
+            <HelpCard
+              icon={<Camera size={20} />}
+              title="Media Gallery"
+              text="Tap photos to view fullscreen. Tap audio recordings to play/pause. All media is saved locally with your story."
+            />
           </div>
         </section>
 
@@ -56,7 +67,7 @@ export function HelpPage() {
 
         {/* Footer Info */}
         <div className="text-center py-8 text-gray-400 text-xs">
-          <p>Pocket Reporter v1.0.0</p>
+          <p>Pocket Reporter v{version}</p>
           <p>Open Source Journalism Tool</p>
         </div>
       </div>
