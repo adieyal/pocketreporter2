@@ -31,7 +31,7 @@ function MediaThumbnail({ item }: { item: MediaItem }) {
   return (
     <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
       {item.type === 'photo' ? (
-        <img src={previewUrl} alt="Attachment" className="w-full h-full object-cover" />
+        previewUrl && <img src={previewUrl} alt="Attachment" className="w-full h-full object-cover" />
       ) : (
         <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
           <PlayCircle size={32} className="mb-1" />
