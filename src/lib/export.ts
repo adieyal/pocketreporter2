@@ -40,6 +40,19 @@ export async function generateStoryZip(story: Story): Promise<Blob> {
     });
   }
 
+  // Fetch Locations and append to markdown
+  const locations = await db.locations.where('storyUuid').equals(story.uuid).toArray();
+
+  if (locations.length > 0) {
+    mdContent += `---\n## Locations\n\n`;
+    locations.forEach(l => {
+      mdContent += `### ${l.name}\n`;
+      if (l.address) mdContent += `**Address:** ${l.address}\n`;
+      if (l.lat && l.lng) mdContent += `**GPS:** ${l.lat}, ${l.lng} ([View Map](https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lng}))\n`;
+      if (l.notes) mdContent += `**Notes:** ${l.notes}\n\n`;
+    });
+  }
+
   root.file('story.md', mdContent);
 
   // 4. Create contacts CSV for spreadsheet import
@@ -62,7 +75,24 @@ export async function generateStoryZip(story: Story): Promise<Blob> {
     root.file('sources.csv', csvContent);
   }
 
-  // 5. Fetch and Add Media Blobs
+  // 5. Create locations CSV
+  if (locations.length > 0) {
+    let locCsv = "Name,Address,Latitude,Longitude,Notes\n";
+    locations.forEach(l => {
+      const safe = (str: string) => `"${(str || '').replace(/"/g, '""')}"`;
+      const row = [
+        safe(l.name),
+        safe(l.address),
+        l.lat || '',
+        l.lng || '',
+        safe(l.notes)
+      ].join(",");
+      locCsv += row + "\n";
+    });
+    root.file('locations.csv', locCsv);
+  }
+
+  // 6. Fetch and Add Media Blobs
   const mediaItems = await db.media.where('storyUuid').equals(story.uuid).toArray();
 
   if (mediaItems.length > 0) {
@@ -77,7 +107,7 @@ export async function generateStoryZip(story: Story): Promise<Blob> {
     });
   }
 
-  // 6. Generate the final ZIP blob
+  // 7. Generate the final ZIP blob
   const content = await zip.generateAsync({ type: 'blob' });
   return content;
 }
