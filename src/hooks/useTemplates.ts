@@ -14,7 +14,10 @@ export function useTemplates() {
         setStoryTypes(data.storyTypes);
         setLoading(false);
       })
-      .catch(err => console.error("Failed to load templates", err));
+      .catch(err => {
+        console.error("Failed to load templates", err);
+        setLoading(false);
+      });
   }, []);
 
   return { categories, storyTypes, loading };

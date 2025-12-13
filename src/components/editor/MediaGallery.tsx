@@ -9,7 +9,7 @@ export function MediaGallery({ items }: { items: MediaItem[] }) {
 
   return (
     <div className="mt-8 mb-4">
-      <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-3">Attached Media ({items.length})</h3>
+      <h3 className="text-sm font-bold text-gray-400 dark:text-dark-text-muted uppercase tracking-wide mb-3">Attached Media ({items.length})</h3>
       <div className="grid grid-cols-3 gap-2">
         {items.map(item => (
           <MediaThumbnail key={item.id} item={item} onPhotoClick={setFullscreenPhoto} />
@@ -97,13 +97,13 @@ function MediaThumbnail({ item, onPhotoClick }: { item: MediaItem; onPhotoClick:
   // Document thumbnail
   if (item.type === 'document') {
     return (
-      <div className="relative aspect-square bg-white rounded-lg overflow-hidden border border-gray-200 group">
+      <div className="relative aspect-square bg-white dark:bg-dark-surface rounded-lg overflow-hidden border border-gray-200 dark:border-dark-border group">
         <div className="absolute inset-0 p-2 opacity-50 blur-[1px]">
           {previewUrl && <img src={previewUrl} alt="Document" className="w-full h-full object-cover" />}
         </div>
-        <div className="absolute inset-0 bg-white/80 p-3 flex flex-col">
+        <div className="absolute inset-0 bg-white/80 dark:bg-dark-surface/90 p-3 flex flex-col">
           <FileText className="text-brand mb-2" size={24} />
-          <p className="text-[10px] text-gray-800 line-clamp-4 font-mono leading-tight">
+          <p className="text-[10px] text-gray-800 dark:text-dark-text line-clamp-4 font-mono leading-tight">
             {item.extractedText || "No text"}
           </p>
         </div>
@@ -119,9 +119,9 @@ function MediaThumbnail({ item, onPhotoClick }: { item: MediaItem; onPhotoClick:
     return (
       <button
         onClick={handleAudioClick}
-        className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 w-full"
+        className="relative aspect-square bg-gray-100 dark:bg-dark-border rounded-lg overflow-hidden border border-gray-200 dark:border-dark-border w-full"
       >
-        <div className={`w-full h-full flex flex-col items-center justify-center ${isPlaying ? 'text-brand' : 'text-gray-500'}`}>
+        <div className={`w-full h-full flex flex-col items-center justify-center ${isPlaying ? 'text-brand' : 'text-gray-500 dark:text-dark-text-muted'}`}>
           {isPlaying ? (
             <PauseCircle size={32} className="mb-1" />
           ) : (
@@ -140,7 +140,7 @@ function MediaThumbnail({ item, onPhotoClick }: { item: MediaItem; onPhotoClick:
   return (
     <button
       onClick={() => onPhotoClick(item)}
-      className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 w-full"
+      className="relative aspect-square bg-gray-100 dark:bg-dark-border rounded-lg overflow-hidden border border-gray-200 dark:border-dark-border w-full"
     >
       {previewUrl && <img src={previewUrl} alt="Attachment" className="w-full h-full object-cover" />}
       <div className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full">

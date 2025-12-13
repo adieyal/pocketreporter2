@@ -20,6 +20,10 @@ export function LocationModal({ isOpen, onClose, onSave, editingLocation }: Loca
 
   const isEditing = !!editingLocation;
 
+  const resetForm = () => {
+    setFormData({ name: '', address: '', notes: '', lat: undefined, lng: undefined });
+  };
+
   useEffect(() => {
     if (editingLocation) {
       setFormData({
@@ -35,10 +39,6 @@ export function LocationModal({ isOpen, onClose, onSave, editingLocation }: Loca
   }, [editingLocation, isOpen]);
 
   if (!isOpen) return null;
-
-  const resetForm = () => {
-    setFormData({ name: '', address: '', notes: '', lat: undefined, lng: undefined });
-  };
 
   const handleGetGPS = () => {
     setGpsLoading(true);
@@ -90,13 +90,13 @@ export function LocationModal({ isOpen, onClose, onSave, editingLocation }: Loca
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
-      <div className="relative bg-white w-full max-w-lg rounded-t-2xl sm:rounded-xl p-4 shadow-2xl">
+      <div className="relative bg-white dark:bg-dark-surface w-full max-w-lg rounded-t-2xl sm:rounded-xl p-4 shadow-2xl">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-bold flex items-center gap-2">
+          <h3 className="text-lg font-bold flex items-center gap-2 dark:text-dark-text">
             <MapPin className="text-brand" size={20} />
             {isEditing ? 'Edit Location' : 'Add Location'}
           </h3>
-          <button onClick={onClose} className="p-2 bg-gray-100 rounded-full text-gray-500">
+          <button onClick={onClose} className="p-2 bg-gray-100 dark:bg-dark-border rounded-full text-gray-500 dark:text-dark-text-muted">
             <X size={20} />
           </button>
         </div>
@@ -107,17 +107,17 @@ export function LocationModal({ isOpen, onClose, onSave, editingLocation }: Loca
             type="button"
             onClick={handleGetGPS}
             disabled={gpsLoading}
-            className="w-full py-3 bg-blue-50 text-blue-700 font-semibold rounded-xl flex items-center justify-center gap-2 border border-blue-100 active:scale-95 transition-transform disabled:opacity-50"
+            className="w-full py-3 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-semibold rounded-xl flex items-center justify-center gap-2 border border-blue-100 dark:border-blue-800 active:scale-95 transition-transform disabled:opacity-50"
           >
             {gpsLoading ? <Loader2 className="animate-spin" size={18} /> : <Navigation size={18} />}
             {formData.lat ? `GPS: ${formData.lat.toFixed(5)}, ${formData.lng?.toFixed(5)}` : "Use Current GPS Location"}
           </button>
 
           <div>
-            <label className="text-xs font-bold text-gray-400 uppercase">Place Name *</label>
+            <label className="text-xs font-bold text-gray-400 dark:text-dark-text-muted uppercase">Place Name *</label>
             <input
               required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand outline-none"
+              className="w-full p-3 bg-gray-50 dark:bg-dark-border dark:text-dark-text border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-brand outline-none"
               placeholder="e.g. Crime Scene"
               value={formData.name}
               onChange={e => setFormData({ ...formData, name: e.target.value })}
@@ -125,9 +125,9 @@ export function LocationModal({ isOpen, onClose, onSave, editingLocation }: Loca
           </div>
 
           <div>
-            <label className="text-xs font-bold text-gray-400 uppercase">Address / Description</label>
+            <label className="text-xs font-bold text-gray-400 dark:text-dark-text-muted uppercase">Address / Description</label>
             <input
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand outline-none"
+              className="w-full p-3 bg-gray-50 dark:bg-dark-border dark:text-dark-text border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-brand outline-none"
               placeholder="12 Main St / Under the bridge"
               value={formData.address}
               onChange={e => setFormData({ ...formData, address: e.target.value })}
@@ -135,9 +135,9 @@ export function LocationModal({ isOpen, onClose, onSave, editingLocation }: Loca
           </div>
 
           <div>
-            <label className="text-xs font-bold text-gray-400 uppercase">Notes</label>
+            <label className="text-xs font-bold text-gray-400 dark:text-dark-text-muted uppercase">Notes</label>
             <textarea
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand outline-none"
+              className="w-full p-3 bg-gray-50 dark:bg-dark-border dark:text-dark-text border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-brand outline-none"
               rows={2}
               placeholder="Difficult access, entry via side door..."
               value={formData.notes}
@@ -151,7 +151,7 @@ export function LocationModal({ isOpen, onClose, onSave, editingLocation }: Loca
                 type="button"
                 onClick={() => handleSave(true)}
                 disabled={saving || !formData.name}
-                className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
+                className="flex-1 py-3 bg-gray-100 dark:bg-dark-border text-gray-700 dark:text-dark-text font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
               >
                 <Plus size={18} /> Save & Add Another
               </button>

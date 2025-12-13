@@ -8,10 +8,11 @@ import { HelpPage } from './pages/Help';
 import { LockScreen } from './components/ui/LockScreen';
 import { WelcomeWizard } from './components/onboarding/WelcomeWizard';
 import { UpdatePrompt } from './components/ui/UpdatePrompt';
+import { ThemeProvider } from './components/ui/ThemeProvider';
 
 function App() {
   return (
-    <>
+    <ThemeProvider>
       <LockScreen />
       <WelcomeWizard />
       <UpdatePrompt />
@@ -26,7 +27,7 @@ function App() {
           </Route>
         </Routes>
       </HashRouter>
-    </>
+    </ThemeProvider>
   );
 }
 

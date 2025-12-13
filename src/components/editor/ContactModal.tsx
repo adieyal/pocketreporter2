@@ -22,6 +22,10 @@ export function ContactModal({ isOpen, onClose, onSave, editingContact }: Contac
 
   const isEditing = !!editingContact;
 
+  const resetForm = () => {
+    setFormData({ name: '', phone: '', role: '', organization: '', email: '', notes: '' });
+  };
+
   useEffect(() => {
     if (editingContact) {
       setFormData({
@@ -38,10 +42,6 @@ export function ContactModal({ isOpen, onClose, onSave, editingContact }: Contac
   }, [editingContact, isOpen]);
 
   if (!isOpen) return null;
-
-  const resetForm = () => {
-    setFormData({ name: '', phone: '', role: '', organization: '', email: '', notes: '' });
-  };
 
   const handleSave = async (keepOpen: boolean) => {
     if (!formData.name) return;
@@ -67,13 +67,13 @@ export function ContactModal({ isOpen, onClose, onSave, editingContact }: Contac
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       {/* Modal Content */}
-      <div className="relative bg-white w-full max-w-lg rounded-t-2xl sm:rounded-xl p-4 shadow-2xl">
+      <div className="relative bg-white dark:bg-dark-surface w-full max-w-lg rounded-t-2xl sm:rounded-xl p-4 shadow-2xl">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-bold flex items-center gap-2">
+          <h3 className="text-lg font-bold flex items-center gap-2 dark:text-dark-text">
             <User className="text-brand" size={20} />
             {isEditing ? 'Edit Source' : 'New Source'}
           </h3>
-          <button onClick={onClose} className="p-2 bg-gray-100 rounded-full text-gray-500">
+          <button onClick={onClose} className="p-2 bg-gray-100 dark:bg-dark-border rounded-full text-gray-500 dark:text-dark-text-muted">
             <X size={20} />
           </button>
         </div>
@@ -83,11 +83,11 @@ export function ContactModal({ isOpen, onClose, onSave, editingContact }: Contac
 
             {/* Name */}
             <div>
-              <label className="text-xs font-bold text-gray-400 uppercase">Name *</label>
+              <label className="text-xs font-bold text-gray-400 dark:text-dark-text-muted uppercase">Name *</label>
               <input
                 required
                 autoFocus
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand outline-none"
+                className="w-full p-3 bg-gray-50 dark:bg-dark-border dark:text-dark-text border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-brand outline-none"
                 placeholder="Jane Doe"
                 value={formData.name}
                 onChange={e => setFormData({...formData, name: e.target.value})}
@@ -97,24 +97,24 @@ export function ContactModal({ isOpen, onClose, onSave, editingContact }: Contac
             {/* Phone & Email Row */}
             <div className="flex gap-3">
               <div className="flex-1">
-                <label className="text-xs font-bold text-gray-400 uppercase flex items-center gap-1">
+                <label className="text-xs font-bold text-gray-400 dark:text-dark-text-muted uppercase flex items-center gap-1">
                   <Phone size={12} /> Phone
                 </label>
                 <input
                   type="tel"
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand outline-none"
+                  className="w-full p-3 bg-gray-50 dark:bg-dark-border dark:text-dark-text border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-brand outline-none"
                   placeholder="082 555..."
                   value={formData.phone}
                   onChange={e => setFormData({...formData, phone: e.target.value})}
                 />
               </div>
               <div className="flex-1">
-                <label className="text-xs font-bold text-gray-400 uppercase flex items-center gap-1">
+                <label className="text-xs font-bold text-gray-400 dark:text-dark-text-muted uppercase flex items-center gap-1">
                   <Mail size={12} /> Email
                 </label>
                 <input
                   type="email"
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand outline-none"
+                  className="w-full p-3 bg-gray-50 dark:bg-dark-border dark:text-dark-text border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-brand outline-none"
                   placeholder="jane@example.com"
                   value={formData.email}
                   onChange={e => setFormData({...formData, email: e.target.value})}
@@ -124,11 +124,11 @@ export function ContactModal({ isOpen, onClose, onSave, editingContact }: Contac
 
             {/* Role & Org */}
             <div>
-              <label className="text-xs font-bold text-gray-400 uppercase flex items-center gap-1">
+              <label className="text-xs font-bold text-gray-400 dark:text-dark-text-muted uppercase flex items-center gap-1">
                 <Briefcase size={12} /> Role / Org
               </label>
               <input
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand outline-none"
+                className="w-full p-3 bg-gray-50 dark:bg-dark-border dark:text-dark-text border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-brand outline-none"
                 placeholder="Witness / Resident Association"
                 value={formData.role}
                 onChange={e => setFormData({...formData, role: e.target.value})}
@@ -137,11 +137,11 @@ export function ContactModal({ isOpen, onClose, onSave, editingContact }: Contac
 
             {/* Notes */}
             <div>
-              <label className="text-xs font-bold text-gray-400 uppercase flex items-center gap-1">
+              <label className="text-xs font-bold text-gray-400 dark:text-dark-text-muted uppercase flex items-center gap-1">
                 <FileText size={12} /> Context Notes
               </label>
               <textarea
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand outline-none"
+                className="w-full p-3 bg-gray-50 dark:bg-dark-border dark:text-dark-text border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-brand outline-none"
                 rows={2}
                 placeholder="Met at scene, wearing red shirt..."
                 value={formData.notes}
@@ -156,7 +156,7 @@ export function ContactModal({ isOpen, onClose, onSave, editingContact }: Contac
                 type="button"
                 onClick={() => handleSave(true)}
                 disabled={saving || !formData.name}
-                className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
+                className="flex-1 py-3 bg-gray-100 dark:bg-dark-border text-gray-700 dark:text-dark-text font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
               >
                 <Plus size={18} /> Save & Add Another
               </button>

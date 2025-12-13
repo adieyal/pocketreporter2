@@ -8,6 +8,7 @@ import { useEditor } from '../hooks/useEditor';
 import { useMedia } from '../hooks/useMedia';
 import { useContacts } from '../hooks/useContacts';
 import { useLocations } from '../hooks/useLocations';
+import { useSafetyTimer } from '../hooks/useSafetyTimer';
 
 // Components
 import { QuestionCard } from '../components/editor/QuestionCard';
@@ -18,6 +19,8 @@ import { ContactModal } from '../components/editor/ContactModal';
 import { LocationList } from '../components/editor/LocationList';
 import { LocationModal } from '../components/editor/LocationModal';
 import { ScannerModal } from '../components/editor/ScannerModal';
+import { SafetyWidget } from '../components/safety/SafetyWidget';
+import { DistressAlert } from '../components/safety/DistressAlert';
 
 // Utils
 import { generateStoryZip } from '../lib/export';
@@ -31,6 +34,7 @@ export function EditorPage() {
   const { media, addMedia, addDocument, uploading } = useMedia(storyUuid);
   const { contacts, addContact, updateContact, deleteContact } = useContacts(storyUuid);
   const { locations, addLocation, updateLocation, deleteLocation } = useLocations(storyUuid);
+  const { timeLeft, isExpired, isActive, startTimer, stopTimer, checkIn } = useSafetyTimer();
 
   // 2. Modal States
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -64,8 +68,8 @@ export function EditorPage() {
     }
   };
 
-  if (loading) return <div className="p-8 text-center text-gray-500">Loading story...</div>;
-  if (!story) return <div className="p-8 text-center text-red-500">Story not found.</div>;
+  if (loading) return <div className="p-8 text-center text-gray-500 dark:text-dark-text-muted">Loading story...</div>;
+  if (!story) return <div className="p-8 text-center text-red-500 dark:text-red-400">Story not found.</div>;
 
   const questions = story.templateSnapshot.questions;
   const inputQuestions = questions.filter(q => !q.isTip);
@@ -73,18 +77,32 @@ export function EditorPage() {
   const progress = Math.round((answeredCount / inputQuestions.length) * 100);
 
   return (
-    <div className="pb-40 bg-gray-50 min-h-screen">
+    <div className="pb-40 bg-gray-50 dark:bg-dark-bg min-h-screen">
+
+      {/* --- SAFETY TIMER DISTRESS ALERT --- */}
+      {isExpired && story && (
+        <DistressAlert story={story} onDismiss={stopTimer} />
+      )}
+
+      {/* --- SAFETY TIMER WIDGET --- */}
+      <SafetyWidget
+        timeLeft={timeLeft}
+        isActive={isActive}
+        onStart={startTimer}
+        onStop={stopTimer}
+        onCheckIn={checkIn}
+      />
 
       {/* --- HEADER --- */}
-      <header className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-30 px-4 py-3">
+      <header className="sticky top-0 bg-white/95 dark:bg-dark-surface/95 backdrop-blur-sm border-b border-gray-200 dark:border-dark-border z-30 px-4 py-3">
         <div className="flex justify-between items-center mb-2">
-          <Link to="/" className="text-gray-500 hover:text-gray-900">
+          <Link to="/" className="text-gray-500 dark:text-dark-text-muted hover:text-gray-900 dark:hover:text-dark-text">
             <ArrowLeft size={24} />
           </Link>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-xs font-medium text-gray-400 uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-xs font-medium text-gray-400 dark:text-dark-text-muted uppercase tracking-wider">
               {saving ? (
-                <span className="flex items-center gap-1 text-gray-500"><Cloud size={14} /> Saving...</span>
+                <span className="flex items-center gap-1 text-gray-500 dark:text-dark-text-muted"><Cloud size={14} /> Saving...</span>
               ) : (
                 <span className="flex items-center gap-1 text-brand"><CheckCircle2 size={14} /> Saved</span>
               )}
@@ -92,13 +110,13 @@ export function EditorPage() {
             <button
               onClick={handleExport}
               disabled={exporting || saving}
-              className="text-brand p-2 bg-brand-light rounded-full disabled:opacity-50 active:scale-95 transition-transform"
+              className="text-brand p-2 bg-brand-light dark:bg-brand/20 rounded-full disabled:opacity-50 active:scale-95 transition-transform"
             >
               {exporting ? <Loader2 className="animate-spin" size={20} /> : <Share size={20} />}
             </button>
           </div>
         </div>
-        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div className="w-full h-1.5 bg-gray-100 dark:bg-dark-border rounded-full overflow-hidden">
           <div
             className="h-full bg-brand transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}
@@ -111,15 +129,15 @@ export function EditorPage() {
 
         {/* Headline */}
         <div className="mb-8">
-          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">Headline</label>
+          <label className="block text-[10px] font-bold text-gray-400 dark:text-dark-text-muted uppercase tracking-wide mb-1">Headline</label>
           <input
             type="text"
             value={story.headline}
             onChange={(e) => updateHeadline(e.target.value)}
-            className="w-full text-2xl font-bold text-gray-900 placeholder-gray-300 bg-transparent border-none p-0 focus:ring-0 outline-none"
+            className="w-full text-2xl font-bold text-gray-900 dark:text-dark-text placeholder-gray-300 dark:placeholder-dark-text-muted bg-transparent border-none p-0 focus:ring-0 outline-none"
             placeholder="Enter headline..."
           />
-          <div className="text-xs text-brand mt-1 font-medium bg-brand-light inline-block px-2 py-1 rounded">
+          <div className="text-xs text-brand mt-1 font-medium bg-brand-light dark:bg-brand/20 inline-block px-2 py-1 rounded">
             {story.templateSnapshot.name}
           </div>
         </div>
@@ -151,7 +169,7 @@ export function EditorPage() {
             <button
               onClick={() => setStatus('draft')}
               disabled={saving}
-              className="w-full flex items-center justify-center gap-2 py-4 bg-gray-100 text-gray-700 font-semibold rounded-xl active:scale-[0.99] transition-all disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-4 bg-gray-100 dark:bg-dark-border text-gray-700 dark:text-dark-text font-semibold rounded-xl active:scale-[0.99] transition-all disabled:opacity-50"
             >
               <Pencil size={20} />
               Revert to Draft
@@ -159,7 +177,7 @@ export function EditorPage() {
           )}
         </div>
 
-        <hr className="my-8 border-gray-200" />
+        <hr className="my-8 border-gray-200 dark:border-dark-border" />
 
         {/* Lists & Gallery */}
         <ContactList
