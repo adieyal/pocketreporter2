@@ -1,19 +1,17 @@
 import { Camera, Mic, MapPin, Users, Loader2 } from 'lucide-react';
-import { useMedia } from '../../hooks/useMedia';
 
 interface MediaToolbarProps {
-  storyUuid: string;
+  onAddMedia: (file: File, type: 'photo' | 'audio') => void;
+  uploading: boolean;
   onAddSource: () => void;
   onAddLocation: () => void;
 }
 
-export function MediaToolbar({ storyUuid, onAddSource, onAddLocation }: MediaToolbarProps) {
-  const { addMedia, uploading } = useMedia(storyUuid);
-
+export function MediaToolbar({ onAddMedia, uploading, onAddSource, onAddLocation }: MediaToolbarProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'photo' | 'audio') => {
     const file = e.target.files?.[0];
     if (file) {
-      addMedia(file, type);
+      onAddMedia(file, type);
     }
   };
 
