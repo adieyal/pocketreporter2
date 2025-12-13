@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
-import { PlayCircle, Image as ImageIcon, Mic, FileText } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { PlayCircle, PauseCircle, Image as ImageIcon, Mic, FileText, X } from 'lucide-react';
 import type { MediaItem } from '../../lib/types';
 
 export function MediaGallery({ items }: { items: MediaItem[] }) {
+  const [fullscreenPhoto, setFullscreenPhoto] = useState<MediaItem | null>(null);
+
   if (items.length === 0) return null;
 
   return (
@@ -10,15 +12,54 @@ export function MediaGallery({ items }: { items: MediaItem[] }) {
       <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-3">Attached Media ({items.length})</h3>
       <div className="grid grid-cols-3 gap-2">
         {items.map(item => (
-          <MediaThumbnail key={item.id} item={item} />
+          <MediaThumbnail key={item.id} item={item} onPhotoClick={setFullscreenPhoto} />
         ))}
       </div>
+
+      {/* Fullscreen Photo Lightbox */}
+      {fullscreenPhoto && (
+        <PhotoLightbox item={fullscreenPhoto} onClose={() => setFullscreenPhoto(null)} />
+      )}
     </div>
   );
 }
 
-function MediaThumbnail({ item }: { item: MediaItem }) {
+function PhotoLightbox({ item, onClose }: { item: MediaItem; onClose: () => void }) {
+  const [imageUrl, setImageUrl] = useState<string>('');
+
+  useEffect(() => {
+    const url = URL.createObjectURL(item.blob);
+    setImageUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [item.blob]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[70] bg-black flex items-center justify-center"
+      onClick={onClose}
+    >
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 p-2 bg-white/20 rounded-full text-white z-10"
+      >
+        <X size={24} />
+      </button>
+      {imageUrl && (
+        <img
+          src={imageUrl}
+          alt="Full size"
+          className="max-w-full max-h-full object-contain"
+          onClick={(e) => e.stopPropagation()}
+        />
+      )}
+    </div>
+  );
+}
+
+function MediaThumbnail({ item, onPhotoClick }: { item: MediaItem; onPhotoClick: (item: MediaItem) => void }) {
   const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Create object URL from Blob for display
   useEffect(() => {
@@ -27,6 +68,31 @@ function MediaThumbnail({ item }: { item: MediaItem }) {
     // Cleanup on unmount to prevent memory leaks
     return () => URL.revokeObjectURL(url);
   }, [item.blob]);
+
+  const handleAudioClick = () => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio(previewUrl);
+      audioRef.current.onended = () => setIsPlaying(false);
+    }
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   // Document thumbnail
   if (item.type === 'document') {
@@ -48,20 +114,38 @@ function MediaThumbnail({ item }: { item: MediaItem }) {
     );
   }
 
-  // Photo/Audio thumbnail
-  return (
-    <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-      {item.type === 'photo' ? (
-        previewUrl && <img src={previewUrl} alt="Attachment" className="w-full h-full object-cover" />
-      ) : (
-        <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
-          <PlayCircle size={32} className="mb-1" />
-          <span className="text-xs font-medium">Audio</span>
+  // Audio thumbnail
+  if (item.type === 'audio') {
+    return (
+      <button
+        onClick={handleAudioClick}
+        className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 w-full"
+      >
+        <div className={`w-full h-full flex flex-col items-center justify-center ${isPlaying ? 'text-brand' : 'text-gray-500'}`}>
+          {isPlaying ? (
+            <PauseCircle size={32} className="mb-1" />
+          ) : (
+            <PlayCircle size={32} className="mb-1" />
+          )}
+          <span className="text-xs font-medium">{isPlaying ? 'Playing' : 'Audio'}</span>
         </div>
-      )}
+        <div className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full">
+          <Mic size={12} />
+        </div>
+      </button>
+    );
+  }
+
+  // Photo thumbnail
+  return (
+    <button
+      onClick={() => onPhotoClick(item)}
+      className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 w-full"
+    >
+      {previewUrl && <img src={previewUrl} alt="Attachment" className="w-full h-full object-cover" />}
       <div className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full">
-        {item.type === 'photo' ? <ImageIcon size={12} /> : <Mic size={12} />}
+        <ImageIcon size={12} />
       </div>
-    </div>
+    </button>
   );
 }
