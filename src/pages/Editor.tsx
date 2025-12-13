@@ -16,6 +16,7 @@ import { ContactList } from '../components/editor/ContactList';
 import { ContactModal } from '../components/editor/ContactModal';
 import { LocationList } from '../components/editor/LocationList';
 import { LocationModal } from '../components/editor/LocationModal';
+import { ScannerModal } from '../components/editor/ScannerModal';
 
 // Utils
 import { generateStoryZip } from '../lib/export';
@@ -26,13 +27,14 @@ export function EditorPage() {
 
   // 1. Initialize all hooks
   const { story, loading, saving, updateHeadline, updateAnswer, setStatus } = useEditor(storyUuid);
-  const { media, addMedia, uploading } = useMedia(storyUuid);
+  const { media, addMedia, addDocument, uploading } = useMedia(storyUuid);
   const { contacts, addContact, deleteContact } = useContacts(storyUuid);
   const { locations, addLocation, deleteLocation } = useLocations(storyUuid);
 
   // 2. Modal States
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isLocModalOpen, setIsLocModalOpen] = useState(false);
+  const [isScanModalOpen, setIsScanModalOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
 
   // 3. Handlers
@@ -167,6 +169,7 @@ export function EditorPage() {
         uploading={uploading}
         onAddSource={() => setIsContactModalOpen(true)}
         onAddLocation={() => setIsLocModalOpen(true)}
+        onScanDocument={() => setIsScanModalOpen(true)}
       />
 
       {/* --- MODALS --- */}
@@ -180,6 +183,12 @@ export function EditorPage() {
         isOpen={isLocModalOpen}
         onClose={() => setIsLocModalOpen(false)}
         onSave={async (data) => { await addLocation(data); }}
+      />
+
+      <ScannerModal
+        isOpen={isScanModalOpen}
+        onClose={() => setIsScanModalOpen(false)}
+        onSave={async (blob, text) => { await addDocument(blob, text); }}
       />
 
     </div>

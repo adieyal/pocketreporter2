@@ -39,5 +39,28 @@ export function useMedia(storyUuid: string) {
     }
   };
 
-  return { media, addMedia, uploading };
+  // 3. Add a Document with extracted text
+  const addDocument = async (file: Blob, extractedText: string) => {
+    setUploading(true);
+    const newItem: MediaItem = {
+      storyUuid,
+      type: 'document',
+      blob: file,
+      caption: '',
+      extractedText,
+      createdAt: new Date().toISOString()
+    };
+
+    try {
+      const id = await db.media.add(newItem);
+      setMedia(prev => [...prev, { ...newItem, id: Number(id) }]);
+    } catch (error) {
+      console.error("Failed to save document", error);
+      alert("Could not save document. Check storage space.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return { media, addMedia, addDocument, uploading };
 }
