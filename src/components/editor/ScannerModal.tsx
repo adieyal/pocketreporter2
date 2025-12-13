@@ -29,11 +29,20 @@ export function ScannerModal({ isOpen, onClose, onSave }: ScannerModalProps) {
     setPreviewUrl(URL.createObjectURL(file));
     setStep('scanning');
 
-    const text = await scanImage(file);
-    if (text !== null) {
-      setEditableText(text);
+    try {
+      const text = await scanImage(file);
+      setEditableText(text || '');
+      setStep('review');
+    } catch (error) {
+      console.error('OCR failed:', error);
+      setEditableText('');
       setStep('review');
     }
+  };
+
+  const handleOpenCamera = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    fileInputRef.current?.click();
   };
 
   const handleSave = async () => {
@@ -66,7 +75,7 @@ export function ScannerModal({ isOpen, onClose, onSave }: ScannerModalProps) {
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center pointer-events-none">
       <div className="absolute inset-0 bg-black/50 pointer-events-auto" onClick={handleClose} />
 
-      <div className="bg-white w-full max-w-lg rounded-t-2xl sm:rounded-xl p-4 shadow-2xl pointer-events-auto flex flex-col max-h-[90vh]">
+      <div className="bg-white w-full max-w-lg rounded-t-2xl sm:rounded-xl p-4 shadow-2xl pointer-events-auto flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
 
         {/* Header */}
         <div className="flex justify-between items-center mb-4 shrink-0">
@@ -89,7 +98,7 @@ export function ScannerModal({ isOpen, onClose, onSave }: ScannerModalProps) {
                 Take a clear photo of a document, invoice, or letter to extract the text.
               </p>
               <button
-                onClick={() => fileInputRef.current?.click()}
+                onClick={handleOpenCamera}
                 className="py-3 px-6 bg-brand text-white font-bold rounded-xl shadow-lg active:scale-95 transition-transform"
               >
                 Open Camera
