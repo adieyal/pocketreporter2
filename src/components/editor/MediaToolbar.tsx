@@ -1,12 +1,13 @@
-import { Camera, Mic, Paperclip, Users } from 'lucide-react';
+import { Camera, Mic, Users, MapPin } from 'lucide-react';
 import { useMedia } from '../../hooks/useMedia';
 
 interface MediaToolbarProps {
   storyUuid: string;
   onSourceClick?: () => void;
+  onLocationClick?: () => void;
 }
 
-export function MediaToolbar({ storyUuid, onSourceClick }: MediaToolbarProps) {
+export function MediaToolbar({ storyUuid, onSourceClick, onLocationClick }: MediaToolbarProps) {
   const { addMedia, uploading } = useMedia(storyUuid);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'photo' | 'audio') => {
@@ -60,11 +61,15 @@ export function MediaToolbar({ storyUuid, onSourceClick }: MediaToolbarProps) {
         <span className="text-xs">Source</span>
       </button>
 
-      <button className="flex flex-col items-center gap-1 text-gray-400">
-        <div className="bg-gray-50 p-3 rounded-full">
-          <Paperclip size={24} />
+      {/* Location */}
+      <button
+        onClick={onLocationClick}
+        className="flex flex-col items-center gap-1 text-gray-600 active:scale-95 transition-transform"
+      >
+        <div className="bg-gray-100 p-3 rounded-full">
+          <MapPin size={24} />
         </div>
-        <span className="text-xs">Attach</span>
+        <span className="text-xs">Location</span>
       </button>
     </div>
   );

@@ -58,3 +58,14 @@ export interface SourceContact {
   notes: string;
   createdAt: string;
 }
+
+export interface StoryLocation {
+  id?: number;
+  storyUuid: string;
+  name: string;
+  address: string;
+  lat?: number;
+  lng?: number;
+  notes: string;
+  createdAt: string;
+}

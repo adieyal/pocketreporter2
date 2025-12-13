@@ -4,11 +4,14 @@ import { ArrowLeft, Cloud, CheckCircle2, Share, Loader2, Check, Pencil } from 'l
 import { useEditor } from '../hooks/useEditor';
 import { useMedia } from '../hooks/useMedia';
 import { useContacts } from '../hooks/useContacts';
+import { useLocations } from '../hooks/useLocations';
 import { QuestionCard } from '../components/editor/QuestionCard';
 import { MediaToolbar } from '../components/editor/MediaToolbar';
 import { MediaGallery } from '../components/editor/MediaGallery';
 import { ContactModal } from '../components/editor/ContactModal';
 import { ContactList } from '../components/editor/ContactList';
+import { LocationModal } from '../components/editor/LocationModal';
+import { LocationList } from '../components/editor/LocationList';
 import { generateStoryZip } from '../lib/export';
 
 export function EditorPage() {
@@ -17,9 +20,11 @@ export function EditorPage() {
   const { story, loading, saving, updateHeadline, updateAnswer, setStatus } = useEditor(storyUuid);
   const { media } = useMedia(storyUuid);
   const { contacts, addContact, deleteContact } = useContacts(storyUuid);
+  const { locations, addLocation, deleteLocation } = useLocations(storyUuid);
 
   const [exporting, setExporting] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   const handleExport = async () => {
     if (!story) return;
@@ -147,6 +152,9 @@ export function EditorPage() {
         {/* Contacts List */}
         <ContactList contacts={contacts} onDelete={deleteContact} />
 
+        {/* Locations List */}
+        <LocationList locations={locations} onDelete={deleteLocation} />
+
         {/* Media Gallery */}
         <MediaGallery items={media} />
 
@@ -155,13 +163,24 @@ export function EditorPage() {
       </div>
 
       {/* Media Toolbar */}
-      <MediaToolbar storyUuid={storyUuid} onSourceClick={() => setIsContactModalOpen(true)} />
+      <MediaToolbar
+        storyUuid={storyUuid}
+        onSourceClick={() => setIsContactModalOpen(true)}
+        onLocationClick={() => setIsLocationModalOpen(true)}
+      />
 
       {/* Contact Modal */}
       <ContactModal
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
         onSave={async (data) => { await addContact(data); }}
+      />
+
+      {/* Location Modal */}
+      <LocationModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+        onSave={async (data) => { await addLocation(data); }}
       />
     </div>
   );
