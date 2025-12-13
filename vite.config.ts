@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['templates.json', 'favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'Pocket Reporter',

@@ -7,12 +7,14 @@ import { EditorPage } from './pages/Editor';
 import { HelpPage } from './pages/Help';
 import { LockScreen } from './components/ui/LockScreen';
 import { WelcomeWizard } from './components/onboarding/WelcomeWizard';
+import { UpdatePrompt } from './components/ui/UpdatePrompt';
 
 function App() {
   return (
     <>
       <LockScreen />
       <WelcomeWizard />
+      <UpdatePrompt />
       <HashRouter>
         <Routes>
           <Route element={<Layout />}>
