@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Component, type ReactNode } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { RefreshCw, X } from 'lucide-react';
 
-export function UpdatePrompt() {
+function UpdatePromptInner() {
   const [showPrompt, setShowPrompt] = useState(false);
 
   const {
@@ -61,5 +61,42 @@ export function UpdatePrompt() {
         </button>
       </div>
     </div>
+  );
+}
+
+// Error boundary wrapper to prevent PWA issues from crashing the app
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+class UpdatePromptErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(): ErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('UpdatePrompt error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // Silently fail - PWA update prompt is not critical
+      return null;
+    }
+    return this.props.children;
+  }
+}
+
+export function UpdatePrompt() {
+  return (
+    <UpdatePromptErrorBoundary>
+      <UpdatePromptInner />
+    </UpdatePromptErrorBoundary>
   );
 }
